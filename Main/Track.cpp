@@ -336,6 +336,7 @@ void Track::DrawBase(class RenderQueue& rq)
 	params.SetParameter("lCol", laserColors[0]);
 	params.SetParameter("rCol", laserColors[1]);
 	params.SetParameter("hidden", m_trackHide);
+	params.SetParameter("timing", g_timing);
 	rq.Draw(transform, trackMesh, trackMaterial, params);
 
 	// Draw the main beat ticks on the track
@@ -398,6 +399,7 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 				params.SetParameter("hitState", currentObjectGlowState);
 
 			params.SetParameter("objectGlow", currentObjectGlow);
+			params.SetParameter("timing", g_timing);
 			mat = holdButtonMaterial;
 		}
 
@@ -458,6 +460,7 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 			}
 			laserParams.SetParameter("mainTex", texture);
 			laserParams.SetParameter("laserPart", part);
+			laserParams.SetParameter("timing", g_timing);
 
 			// Get the length of this laser segment
 			Transform laserTransform = trackOrigin;

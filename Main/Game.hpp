@@ -2,6 +2,7 @@
 #include "ApplicationTickable.hpp"
 #include "AsyncLoadable.hpp"
 #include <Beatmap/MapDatabase.hpp>
+extern Vector4 g_timing;
 
 class MultiplayerScreen;
 

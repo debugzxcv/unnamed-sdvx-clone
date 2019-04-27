@@ -31,7 +31,7 @@ extern "C"
 }
 
 #include "GUI/HealthGauge.hpp"
-
+Vector4 g_timing;
 // Try load map helper
 Ref<Beatmap> TryLoadMap(const String& path)
 {
@@ -161,6 +161,9 @@ private:
 	Map<ScoreIndex*, ScoreReplay> m_scoreReplays;
 	MapDatabase* m_db;
 	std::unordered_set<ObjectState*> m_hiddenObjects;
+
+	float offsyncTimer = 0.0f;
+	float gameplayTimer = 0.0f;
 
 public:
 	Game_Impl(const String& mapPath, GameFlags flags)
@@ -1059,6 +1062,15 @@ public:
 
 		// Get the current timing point
 		m_currentTiming = &m_playback.GetCurrentTimingPoint();
+		g_timing.x = m_playback.GetBeatTime();
+		g_timing.z = m_playback.GetLastTime() / 1000.0f;
+		offsyncTimer += (deltaTime / m_currentTiming->beatDuration) * 1000.0 * m_audioPlayback.GetPlaybackSpeed();
+		offsyncTimer = fmodf(offsyncTimer, 1.0f);
+		g_timing.y = offsyncTimer;
+		gameplayTimer += deltaTime;
+		// gameplayTimer = fmodf(gameplayTimer, 1.0f);
+		g_timing.w = gameplayTimer;
+
 
 		// Update song info display
 		ObjectState *const* lastObj = &m_beatmap->GetLinearObjects().back();

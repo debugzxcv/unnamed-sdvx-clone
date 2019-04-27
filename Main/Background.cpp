@@ -164,7 +164,6 @@ class TestBackground : public FullscreenBackground
 		}
 
 		bool cleared = game->GetScoring().currentGauge >= clearBorder;
-
 		if (cleared)
 			clearTransition += deltaTime / tp.beatDuration * 1000;
 		else
@@ -179,7 +178,7 @@ class TestBackground : public FullscreenBackground
 		fullscreenMaterialParams.SetParameter("clearTransition", clearTransition);
 		fullscreenMaterialParams.SetParameter("tilt", tilt);
 		fullscreenMaterialParams.SetParameter("screenCenter", screenCenter);
-		fullscreenMaterialParams.SetParameter("timing", timing);
+		fullscreenMaterialParams.SetParameter("timing", g_timing);
 		if (foreground && hasFbTex)
 		{
 			frameBufferTexture->SetFromFrameBuffer();
