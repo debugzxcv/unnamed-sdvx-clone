@@ -1232,7 +1232,7 @@ public:
 		emitter->material = particleMaterial;
 		emitter->texture = basicParticleTexture;
 		emitter->loops = 1;
-		emitter->duration = 0.15f;
+		emitter->duration = 0.125f;
 		emitter->SetSpawnRate(PPRange<float>(50, 0));
 		emitter->SetStartPosition(PPBox(Vector3(width * 0.5f, 0.0f, 0)));
 		emitter->SetStartSize(PPRandomRange<float>(0.3f, 0.1f));
