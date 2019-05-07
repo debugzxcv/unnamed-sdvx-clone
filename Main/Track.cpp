@@ -370,10 +370,11 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 		float length;
 		float currentObjectGlow = active ? objectGlow : 0.3f;
 		int currentObjectGlowState = active ? 2 + objectGlowState : 0;
-		if(mobj->button.index < 4) // Normal button
+		int buttonIndex = mobj->button.index;
+		if(buttonIndex < 4) // Normal button
 		{
 			width = buttonWidth;
-			xposition = buttonTrackWidth * -0.5f + width * mobj->button.index;
+			xposition = buttonTrackWidth * -0.5f + width * buttonIndex;
 			length = buttonLength;
 			params.SetParameter("hasSample", mobj->button.hasSample);
 			params.SetParameter("mainTex", isHold ? buttonHoldTexture : buttonTexture);
@@ -382,7 +383,7 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 		else // FX Button
 		{
 			width = fxbuttonWidth;
-			xposition = buttonTrackWidth * -0.5f + fxbuttonWidth *(mobj->button.index - 4);
+			xposition = buttonTrackWidth * -0.5f + fxbuttonWidth *(buttonIndex - 4);
 			length = fxbuttonLength;
 			params.SetParameter("hasSample", mobj->button.hasSample);
 			params.SetParameter("mainTex", isHold ? fxbuttonHoldTexture : fxbuttonTexture);
@@ -400,6 +401,7 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 
 			params.SetParameter("objectGlow", currentObjectGlow);
 			params.SetParameter("timing", g_timing);
+			params.SetParameter("fxbutton", buttonIndex < 4 ? 0.f : 1.f);
 			mat = holdButtonMaterial;
 		}
 
