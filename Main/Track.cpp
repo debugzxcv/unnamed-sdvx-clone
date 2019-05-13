@@ -60,6 +60,7 @@ bool Track::AsyncLoad()
 
 	// mip-mapped and anisotropicaly filtered track textures
 	loader->AddTexture(trackTexture, "track.png");
+	loader->AddTexture(trackHighlightTexture, "track_highlight.png");
 	loader->AddTexture(trackTickTexture, "tick.png");
 
 	// Scoring texture
@@ -119,6 +120,9 @@ bool Track::AsyncFinalize()
 	trackTexture->SetMipmaps(false);
 	trackTexture->SetFilter(true, true, 16.0f);
 	trackTexture->SetWrap(TextureWrap::Clamp, TextureWrap::Clamp);
+	trackHighlightTexture->SetMipmaps(false);
+	trackHighlightTexture->SetFilter(true, true, 16.0f);
+	trackHighlightTexture->SetWrap(TextureWrap::Clamp, TextureWrap::Repeat);
 	trackTickTexture->SetMipmaps(true);
 	trackTickTexture->SetFilter(true, true, 16.0f);
 	trackTickTexture->SetWrap(TextureWrap::Repeat, TextureWrap::Clamp);
@@ -181,6 +185,7 @@ bool Track::AsyncFinalize()
 	// Generate simple planes for the playfield track and elements
 	trackMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -1), Vector2(trackWidth, trackLength + 1));
 	trackCoverMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -trackLength), Vector2(trackWidth, trackLength * 2));
+	// trackHighlightMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -1), Vector2(trackWidth, trackLength + 1));
 	trackTickMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, 0.0f), Vector2(trackWidth, trackTickLength));
 	centeredTrackMesh = MeshGenerators::Quad(g_gl, Vector2(-0.5f, -0.5f), Vector2(1.0f, 1.0f));
 
@@ -337,6 +342,12 @@ void Track::DrawBase(class RenderQueue& rq)
 	params.SetParameter("rCol", laserColors[1]);
 	params.SetParameter("hidden", m_trackHide);
 	params.SetParameter("timing", g_timing);
+	params.SetParameter("highlight", 0.f);
+	rq.Draw(transform, trackMesh, trackMaterial, params);
+
+	params.SetParameter("mainTex", trackHighlightTexture);
+	params.SetParameter("highlight", 1.f);
+	// transform *= Transform::Translation(Vector3(0.f, 0.f, 0.01f));
 	rq.Draw(transform, trackMesh, trackMaterial, params);
 
 	// Draw the main beat ticks on the track

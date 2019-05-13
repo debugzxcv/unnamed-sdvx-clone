@@ -89,11 +89,13 @@ public:
 
 	/* Track base graphics */
 	Mesh trackMesh;
+	// Mesh trackHighlightMesh;
 	Mesh trackTickMesh;
 	Mesh trackCoverMesh;
 	Material trackMaterial; // Also used for buttons
 	Texture trackTexture;
 	Texture trackCoverTexture;
+	Texture trackHighlightTexture;
 	Texture trackTickTexture;
 
 	/* Object graphics */
