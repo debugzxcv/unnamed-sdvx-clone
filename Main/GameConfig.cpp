@@ -125,4 +125,10 @@ void GameConfig::InitDefaults()
 	Set(GameConfigKeys::MultiplayerHost, "usc-multi.drewol.me:39079");
 	Set(GameConfigKeys::MultiplayerPassword, "");
 	Set(GameConfigKeys::MultiplayerUsername, "");
+
+	Set(GameConfigKeys::c_anchor, -0.8f);
+	Set(GameConfigKeys::c_contnr, -0.9f);
+	Set(GameConfigKeys::uUpper, 4.675f);
+	Set(GameConfigKeys::uLower, -2.8195f);
+
 }

@@ -114,6 +114,9 @@ DefineEnum(GameConfigKeys,
 	MultiplayerHost,
 	MultiplayerPassword,
 	MultiplayerUsername
+
+	,c_anchor,c_contnr,
+	uUpper,uLower
 	);
 
 DefineEnum(SpeedMods,

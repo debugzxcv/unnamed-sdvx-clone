@@ -1302,6 +1302,11 @@ public:
 		textPos.y += RenderText(Utility::Sprintf("Track Zoom Top: %f", m_camera.pLanePitch), textPos).y;
 		textPos.y += RenderText(Utility::Sprintf("Track Zoom Bottom: %f", m_camera.pLaneZoom), textPos).y;
 
+		textPos.y += RenderText(Utility::Sprintf("c_anchor: %f", Camera::c_anchor), textPos).y;
+		textPos.y += RenderText(Utility::Sprintf("c_contnr: %f", Camera::c_contnr), textPos).y;
+		textPos.y += RenderText(Utility::Sprintf("c_uUpper: %f", Camera::c_uUpper), textPos).y;
+		textPos.y += RenderText(Utility::Sprintf("c_uLower: %f", Camera::c_uLower), textPos).y;
+
 		Vector2 buttonStateTextPos = Vector2(g_resolution.x - 200.0f, 100.0f);
 		RenderText(g_input.GetControllerStateString(), buttonStateTextPos);
 
@@ -1626,6 +1631,33 @@ public:
 		else if(key == SDLK_F9)
 		{
 			g_application->ReloadScript("gameplay", m_lua);
+		}
+		if (m_renderDebugHUD)
+		{
+			if(key == SDLK_UP)
+			{
+				auto const m = g_gameWindow->GetModifierKeys();
+				if (m == ModifierKeys::None)
+					Camera::c_contnr+=.01f;
+				else if (m == ModifierKeys::Ctrl)
+					Camera::c_anchor+=.01f;
+				else if (m == ModifierKeys::Shift)
+					Camera::c_uUpper+=.01f;
+				else if (m == ModifierKeys::Alt)
+					Camera::c_uLower+=.01f;
+			}
+			else if(key == SDLK_DOWN)
+			{
+				auto const m = g_gameWindow->GetModifierKeys();
+				if (m == ModifierKeys::None)
+					Camera::c_contnr-=.01f;
+				else if (m == ModifierKeys::Ctrl)
+					Camera::c_anchor-=.01f;
+				else if (m == ModifierKeys::Shift)
+					Camera::c_uUpper-=.01f;
+				else if (m == ModifierKeys::Alt)
+					Camera::c_uLower-=.01f;
+			}
 		}
 	}
 	void m_OnButtonPressed(Input::Button buttonCode)

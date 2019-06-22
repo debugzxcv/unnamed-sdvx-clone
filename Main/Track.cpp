@@ -18,7 +18,7 @@ Track::Track()
 {
 	m_viewRange = 2.0f;
 	if (g_aspectRatio < 1.0f)
-		trackLength = 12.0f;
+		trackLength = 10.0f;
 	else
 		trackLength = 10.0f;
 }
@@ -356,7 +356,7 @@ void Track::DrawBase(class RenderQueue& rq)
 	for(float f : m_barTicks)
 	{
 		float fLocal = f / m_viewRange;
-		Vector3 tickPosition = Vector3(0.0f, trackLength * fLocal - trackTickLength * 0.5f, 0.01f);
+		Vector3 tickPosition = Vector3(0.0f, trackLength * fLocal - trackTickLength * 0.5f, 0.0f);
 		Transform tickTransform = trackOrigin;
 		tickTransform *= Transform::Translation(tickPosition);
 		rq.Draw(tickTransform, trackTickMesh, buttonMaterial, params);

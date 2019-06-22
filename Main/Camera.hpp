@@ -82,6 +82,11 @@ public:
 	Transform worldNoRoll;
 	Transform critOrigin;
 
+	static float c_anchor;
+	static float c_contnr;
+	static float c_uUpper;
+	static float c_uLower;
+
 private:
 	float m_ClampRoll(float in) const;
 	// x offset

@@ -2,17 +2,30 @@
 #include "Camera.hpp"
 #include "Application.hpp"
 #include "Track.hpp"
+#include "GameConfig.hpp"
 
 const float ROLL_AMT = 8;
 const float ZOOM_POW = 1.65f;
 
+float Camera::c_anchor;
+float Camera::c_contnr;
+float Camera::c_uUpper;
+float Camera::c_uLower;
+
 Camera::Camera()
 {
 	m_spinType = SpinStruct::SpinType::None;
+	c_anchor = g_gameConfig.GetFloat(GameConfigKeys::c_anchor);
+	c_contnr = g_gameConfig.GetFloat(GameConfigKeys::c_contnr);
+	c_uUpper = g_gameConfig.GetFloat(GameConfigKeys::uUpper);
+	c_uLower = g_gameConfig.GetFloat(GameConfigKeys::uLower);
 }
 Camera::~Camera()
 {
-
+	g_gameConfig.Set(GameConfigKeys::c_anchor, c_anchor);
+	g_gameConfig.Set(GameConfigKeys::c_contnr, c_contnr);
+	g_gameConfig.Set(GameConfigKeys::uUpper, c_uUpper);
+	g_gameConfig.Set(GameConfigKeys::uLower, c_uLower);
 }
 
 static float DampedSin(float t, float amplitude, float frequency, float decay)
@@ -45,8 +58,8 @@ static float PitchScaleFunc(float input)
 
 	if (g_aspectRatio < 1.0f)
 	{
-		uLower = -2.8195f;
-		uUpper = 4.675f;
+		uLower = Camera::c_uLower;
+		uUpper = Camera::c_uUpper;
 	}
 	else
 	{
@@ -90,9 +103,9 @@ static Transform GetOriginTransform(float pitch, float offs, float roll)
 	if (g_aspectRatio < 1.0f)
 	{
 		auto origin = Transform::Rotation({ 0, 0, roll });
-		auto anchor = Transform::Translation({ offs, -0.8f, 0 })
+		auto anchor = Transform::Translation({ offs, Camera::c_anchor, 0 })
 			* Transform::Rotation({ 1.5f, 0, 0 });
-		auto contnr = Transform::Translation({ 0, 0, -0.9f })
+		auto contnr = Transform::Translation({ 0, 0, Camera::c_contnr })
 			* Transform::Rotation({ -90 + pitch, 0, 0, });
 		return origin * anchor * contnr;
 	}
