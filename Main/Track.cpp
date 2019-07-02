@@ -123,23 +123,23 @@ bool Track::AsyncFinalize()
 	trackHighlightTexture->SetMipmaps(false);
 	trackHighlightTexture->SetFilter(true, true, 16.0f);
 	trackHighlightTexture->SetWrap(TextureWrap::Clamp, TextureWrap::Repeat);
-	trackTickTexture->SetMipmaps(true);
+	trackTickTexture->SetMipmaps();
 	trackTickTexture->SetFilter(true, true, 16.0f);
 	trackTickTexture->SetWrap(TextureWrap::Repeat, TextureWrap::Clamp);
 	trackTickLength = trackTickTexture->CalculateHeight(buttonTrackWidth);
 	scoreHitTexture->SetWrap(TextureWrap::Clamp, TextureWrap::Clamp);
 
-	buttonTexture->SetMipmaps(true);
+	buttonTexture->SetMipmaps();
 	buttonTexture->SetFilter(true, true, 16.0f);
-	buttonHoldTexture->SetMipmaps(true);
+	buttonHoldTexture->SetMipmaps();
 	buttonHoldTexture->SetFilter(true, true, 16.0f);
 	buttonLength = buttonTexture->CalculateHeight(buttonWidth);
 	buttonMesh = MeshGenerators::Quad(g_gl, Vector2(0.0f, 0.0f), Vector2(buttonWidth, buttonLength));
 	buttonMaterial->opaque = false;
 
-	fxbuttonTexture->SetMipmaps(true);
+	fxbuttonTexture->SetMipmaps();
 	fxbuttonTexture->SetFilter(true, true, 16.0f);
-	fxbuttonHoldTexture->SetMipmaps(true);
+	fxbuttonHoldTexture->SetMipmaps();
 	fxbuttonHoldTexture->SetFilter(true, true, 16.0f);
 	fxbuttonLength = fxbuttonTexture->CalculateHeight(fxbuttonWidth);
 	fxbuttonMesh = MeshGenerators::Quad(g_gl, Vector2(0.0f, 0.0f), Vector2(fxbuttonWidth, fxbuttonLength));
@@ -148,14 +148,14 @@ bool Track::AsyncFinalize()
 
 	for (uint32 i = 0; i < 2; i++)
 	{
-		laserTextures[i]->SetMipmaps(true);
+		laserTextures[i]->SetMipmaps();
 		laserTextures[i]->SetFilter(true, true, 16.0f);
 		laserTextures[i]->SetWrap(TextureWrap::Clamp, TextureWrap::Repeat);
 	}
 
 	for(uint32 i = 0; i < 4; i++)
 	{
-		laserTailTextures[i]->SetMipmaps(true);
+		laserTailTextures[i]->SetMipmaps();
 		laserTailTextures[i]->SetFilter(true, true, 16.0f);
 		laserTailTextures[i]->SetWrap(TextureWrap::Clamp, TextureWrap::Clamp);
 	}

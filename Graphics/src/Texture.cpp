@@ -3,11 +3,15 @@
 #include "Texture.hpp"
 #include "Image.hpp"
 #include <Graphics/ResourceManagers.hpp>
-
-
+#include <cmath>
+#include <algorithm>
+#include <numeric>
+#include <string>
+#include <vector>
 
 namespace Graphics
 {
+
 	class Texture_Impl : public TextureRes
 	{
 		uint32 m_texture = 0;
@@ -20,6 +24,7 @@ namespace Graphics
 		float m_anisotropic = 1.0f;
 		void* m_data = nullptr;
 		OpenGL* m_gl = nullptr;
+		std::vector<ImageData<uint8_t, 4>> m_mipmapChain {};
 
 	public:
 		Texture_Impl(OpenGL* gl)
@@ -28,6 +33,8 @@ namespace Graphics
 		}
 		~Texture_Impl()
 		{
+			if(!m_mipmapChain.empty())
+				m_mipmapChain.clear();
 			if(m_texture)
 				glDeleteTextures(1, &m_texture);
 		}
@@ -140,6 +147,20 @@ namespace Graphics
 			m_mipmaps = enabled;
 			UpdateFilterState();
 		}
+		virtual void SetMipmaps(int maxlevel/* = 0 */, double gamma/* = 2.2 */)
+		{
+			glBindTexture(GL_TEXTURE_2D, m_texture);
+			m_mipmapChain = GenerateMipmap(ImageData<uint8_t, 4>(m_size.x, m_size.y, static_cast<uint8_t*>(m_data)), maxlevel, gamma);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, m_mipmapChain.size());
+			for(size_t i = 0; i < m_mipmapChain.size(); ++i){
+				auto const& imageData = m_mipmapChain.at(i);
+				glTexImage2D(GL_TEXTURE_2D, i + 1, GL_RGBA8, imageData.width(), imageData.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, static_cast<void const*>(imageData.data()));
+			}
+			glBindTexture(GL_TEXTURE_2D, 0);
+			m_mipmaps = true;
+			UpdateFilterState();
+		}
 		virtual const Vector2i& GetSize() const
 		{
 			return m_size;
@@ -180,6 +201,87 @@ namespace Graphics
 		{
 			return m_format;
 		}
+
+		static std::vector<ImageData<uint8_t, 4>> GenerateMipmap(ImageData<uint8_t, 4> const& imageData,
+														int maxlevel,
+														float gamma) {
+			std::vector<ImageData<uint8_t, 4>> mipmapChain{};
+			uint32_t const w{imageData.width()};
+			uint32_t const h{imageData.height()};
+			if (maxlevel > 0) {
+				maxlevel = std::min(maxlevel, static_cast<int>(std::floor(std::log2(std::max(w, h)))));
+			} else if (maxlevel < 0) {
+				maxlevel = std::floor(std::log2(std::max(w, h))) + maxlevel;
+			} else {
+				maxlevel = std::floor(std::log2(std::max(w, h)));
+			}
+
+			for (auto l{1}; l <= maxlevel; ++l) {
+				uint32_t x, y, x0, y0, x1, y1;
+				auto const prevlevel{l - 1};
+				auto const pw{std::max(1u, w >> prevlevel)};
+				auto const ph{std::max(1u, h >> prevlevel)};
+				auto const cw{std::max(1u, w >> l)};
+				auto const ch{std::max(1u, h >> l)};
+				ImageData<uint8_t, 4> mipmap{cw, ch};
+				auto curIndex{0};
+				auto const& sampleData{prevlevel == 0 ? imageData : mipmapChain.at(prevlevel - 1)};
+				for (y = 0; y < ch; ++y) {
+					y0 = y << 1;
+					y1 = std::min(y0 + 1, ph - 1);
+					for (x = 0; x < cw; ++x) {
+						x0 = x << 1;
+						x1 = std::min(x0 + 1, pw - 1);
+
+						// sampling
+						std::array<std::array<uint32_t const, 2> const, 4> const samplePoints{{
+							{{x0, y0}}, {{x1, y0}},
+							{{x0, y1}}, {{x1, y1}}
+						}};
+						std::array<std::array<uint8_t, 4>, 4> pixels_;
+						std::transform(
+							samplePoints.begin(), samplePoints.end(), pixels_.begin(),
+							[&sampleData](auto const& p) { return sampleData.ReadPixel(p[0], p[1]); });
+
+						// to linear
+						std::array<std::array<double, 4>, 4> pixels_d;
+						std::transform(
+							pixels_.begin(), pixels_.end(), pixels_d.begin(), [gamma](auto const& pixel_in) {
+								std::array<double, 4> pixel_out;
+								std::transform(
+									pixel_in.begin(), pixel_in.end(), pixel_out.begin(),
+									[gamma](auto const component) {
+										return std::pow(component, gamma);
+									});
+								return pixel_out;
+							});
+
+						// average 4 pixels
+						std::array<double, 4> const result_d{std::reduce(
+							pixels_d.begin(), pixels_d.end(), std::array<double, 4>{},
+							[](auto const& a, auto const& b) {
+								std::array<double, 4> ret;
+								std::transform(
+									a.begin(), a.end(), b.begin(), ret.begin(),
+									[](auto const lhs, auto const rhs) { return (lhs + rhs); });
+								return ret;
+							})};
+
+						// to gamma
+						std::transform(
+							result_d.begin(), result_d.end(), mipmap.data() + curIndex,
+							[gamma](auto const component) {
+								return std::pow(component * .25, 1 / gamma);
+							});
+
+						curIndex += 4;
+					}
+				}
+				mipmapChain.emplace_back(std::move(mipmap));
+			}
+			return mipmapChain;
+		}
+
 	};
 
 	Texture TextureRes::Create(OpenGL* gl)

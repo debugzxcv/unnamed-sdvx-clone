@@ -131,7 +131,8 @@ namespace Graphics
 			if(!f.OpenRead(fullPath))
 				return false;
 
-			Buffer b(f.GetSize());
+			Buffer b;
+			b.resize(f.GetSize());
 			f.Read(b.data(), b.size());
 			if(b.size() < 4)
 				return false;

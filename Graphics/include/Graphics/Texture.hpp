@@ -1,5 +1,8 @@
 #pragma once
 #include <Graphics/ResourceTypes.hpp>
+#include <memory>
+#include <array>
+#include <string>
 
 namespace Graphics
 {
@@ -15,6 +18,58 @@ namespace Graphics
 		RGBA8,
 		D32,
 		Invalid
+	};
+
+	template <class T, uint8_t N>
+	struct ImageData {
+		ImageData(uint32_t width, uint32_t height)
+			: width_{width},
+			height_{height},
+			component_count_{width * height * N},
+			data_{std::make_unique<T[]>(component_count_)} {}
+		ImageData(uint32_t width, uint32_t height, T* data)
+			: width_{width},
+			height_{height},
+			component_count_{width * height * N},
+			from_raw_pointer_{true},
+			data_(data) {}
+		~ImageData() {
+			if (from_raw_pointer_) {
+				data_.release();
+			}
+		}
+		ImageData(ImageData const&) = default;
+		ImageData& operator=(ImageData const&) = default;
+		ImageData(ImageData&&) = default;
+		ImageData& operator=(ImageData&&) = default;
+		uint32_t constexpr width() const noexcept { return width_; }
+		uint32_t constexpr height() const noexcept { return height_; }
+		uint64_t constexpr size() const noexcept { return component_count_; }
+		// uint64_t constexpr pixels() const noexcept { return width_ * height_; }
+		T* data() noexcept { return data_.get(); }
+		T const* data() const noexcept { return data_.get(); }
+		// T *release() noexcept { return data_.release(); }
+		// T const *release() const noexcept { return data_.release(); }
+		std::array<T, N> ReadPixel(uint32_t x, uint32_t y) const {
+			// assert(data_ != nullptr);
+
+			std::array<T, N> dst;
+			std::memcpy(dst.data(), data_.get() + (y * width_ + x) * N, N);
+			return dst;
+			// auto dst = std::make_unique<T[]>(N);
+			// std::memcpy(dst.get(), data_.get() + (y * width_ + x) * N, N);
+			// return dst.release();
+
+			// auto dst = new T[N];
+			// std::memcpy(dst, data_.get() + (y * width_ + x) * N, N);
+			// return dst;
+		}
+
+	private:
+		uint32_t width_, height_;
+		uint64_t component_count_;
+		bool from_raw_pointer_;
+		std::unique_ptr<T[]> data_;
 	};
 
 	class ImageRes;
@@ -33,6 +88,7 @@ namespace Graphics
 		virtual void SetData(Vector2i size, void* pData) = 0;
 		virtual void SetFromFrameBuffer(Vector2i pos = { 0, 0 }) = 0;
 		virtual void SetMipmaps(bool enabled) = 0;
+		virtual void SetMipmaps(int maxlevel = 0, double gamma = 2.2) = 0;
 		virtual void SetFilter(bool enabled, bool mipFiltering = true, float anisotropic = 1.0f) = 0;
 		virtual const Vector2i& GetSize() const = 0;
 

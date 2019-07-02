@@ -25,7 +25,7 @@ enable_precompiled_headers("${Graphics_src}" src/stdafx.cpp)
 # Look for static included GLEW before other directories
 include_directories(include include/Graphics src)
 add_library(Graphics ${Graphics_src})
-
+target_compile_features(Graphics PRIVATE cxx_std_17)
 # Public include paths for library
 target_include_directories(Graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${GLEW_ROOT}/include)
 
