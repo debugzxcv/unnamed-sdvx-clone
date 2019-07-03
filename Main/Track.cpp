@@ -18,7 +18,7 @@ Track::Track()
 {
 	m_viewRange = 2.0f;
 	if (g_aspectRatio < 1.0f)
-		trackLength = 10.0f;
+		trackLength = 11.0f;
 	else
 		trackLength = 10.0f;
 }
@@ -178,13 +178,14 @@ bool Track::AsyncFinalize()
 	{
 		m_laserTrackBuilder[i] = new LaserTrackBuilder(g_gl, this, i);
 		m_laserTrackBuilder[i]->laserBorderPixels = 12;
-		m_laserTrackBuilder[i]->laserLengthScale = trackLength / (GetViewRange() * laserSpeedOffset);
+		m_laserTrackBuilder[i]->laserLengthScale = trackLength / (m_viewRange * laserSpeedOffset);
 		m_laserTrackBuilder[i]->Reset(); // Also initializes the track builder
 	}
 
 	// Generate simple planes for the playfield track and elements
 	trackMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -1), Vector2(trackWidth, trackLength + 1));
 	trackCoverMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -trackLength), Vector2(trackWidth, trackLength * 2));
+	trackMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -1), Vector2(trackWidth, trackLength));
 	// trackHighlightMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, -1), Vector2(trackWidth, trackLength + 1));
 	trackTickMesh = MeshGenerators::Quad(g_gl, Vector2(-trackWidth * 0.5f, 0.0f), Vector2(trackWidth, trackTickLength));
 	centeredTrackMesh = MeshGenerators::Quad(g_gl, Vector2(-0.5f, -0.5f), Vector2(1.0f, 1.0f));
@@ -224,7 +225,7 @@ void Track::Tick(class BeatmapPlayback& playback, float deltaTime)
 
 	// Set the view range of the track
 	trackViewRange = Vector2((float)currentTime, 0.0f);
-	trackViewRange.y = trackViewRange.x + GetViewRange();
+	trackViewRange.y = trackViewRange.x + m_viewRange;
 
 	// Update ticks separating bars to draw
 	double tickTime = (double)currentTime;
@@ -311,7 +312,6 @@ void Track::DrawLaserBase(RenderQueue& rq, class BeatmapPlayback& playback, cons
 		if ((laser->flags & LaserObjectState::flag_Extended) != 0 || m_trackHide > 0.f)
 		{
 			// Calculate height based on time on current track
-			float viewRange = GetViewRange();
 			float position = playback.TimeToViewDistance(obj->time);
 			float posmult = trackLength / (m_viewRange * laserSpeedOffset);
 
@@ -365,8 +365,7 @@ void Track::DrawBase(class RenderQueue& rq)
 void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, ObjectState* obj, bool active)
 {
 	// Calculate height based on time on current track
-	float viewRange = GetViewRange();
-	float position = playback.TimeToViewDistance(obj->time) / viewRange;
+	float position = playback.TimeToViewDistance(obj->time) / m_viewRange;
 	float glow = 0.0f;
 
 	if(obj->type == ObjectType::Single || obj->type == ObjectType::Hold)
@@ -423,7 +422,7 @@ void Track::DrawObjectState(RenderQueue& rq, class BeatmapPlayback& playback, Ob
 		float scale = 1.0f;
 		if(isHold) // Hold Note?
 		{
-			float trackScale = (playback.DurationToViewDistanceAtTime(mobj->time, mobj->hold.duration) / viewRange) / length;
+			float trackScale = (playback.DurationToViewDistanceAtTime(mobj->time, mobj->hold.duration) / m_viewRange) / length;
 			scale = trackScale * trackLength;
 
 			params.SetParameter("trackScale", trackScale);
