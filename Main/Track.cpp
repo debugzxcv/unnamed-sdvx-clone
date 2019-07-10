@@ -18,7 +18,7 @@ Track::Track()
 {
 	m_viewRange = 2.0f;
 	if (g_aspectRatio < 1.0f)
-		trackLength = 11.0f;
+		trackLength = 10.0f;
 	else
 		trackLength = 10.0f;
 }
@@ -131,7 +131,7 @@ bool Track::AsyncFinalize()
 
 	buttonTexture->SetMipmaps();
 	buttonTexture->SetFilter(true, true, 16.0f);
-	buttonHoldTexture->SetMipmaps();
+	buttonHoldTexture->SetMipmaps(false);
 	buttonHoldTexture->SetFilter(true, true, 16.0f);
 	buttonLength = buttonTexture->CalculateHeight(buttonWidth);
 	buttonMesh = MeshGenerators::Quad(g_gl, Vector2(0.0f, 0.0f), Vector2(buttonWidth, buttonLength));
@@ -139,7 +139,7 @@ bool Track::AsyncFinalize()
 
 	fxbuttonTexture->SetMipmaps();
 	fxbuttonTexture->SetFilter(true, true, 16.0f);
-	fxbuttonHoldTexture->SetMipmaps();
+	fxbuttonHoldTexture->SetMipmaps(false);
 	fxbuttonHoldTexture->SetFilter(true, true, 16.0f);
 	fxbuttonLength = fxbuttonTexture->CalculateHeight(fxbuttonWidth);
 	fxbuttonMesh = MeshGenerators::Quad(g_gl, Vector2(0.0f, 0.0f), Vector2(fxbuttonWidth, fxbuttonLength));
