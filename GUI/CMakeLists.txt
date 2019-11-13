@@ -17,6 +17,7 @@ target_include_directories(GUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(GUI Shared)
 target_link_libraries(GUI nanovg)
 target_link_libraries(GUI Graphics)
-target_link_libraries(GUI lua)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/third_party/)
 include(FindLibraries)
+target_link_libraries(GUI LuaJIT::LuaJIT)

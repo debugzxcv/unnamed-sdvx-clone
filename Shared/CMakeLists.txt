@@ -26,7 +26,10 @@ enable_precompiled_headers("${Shared_src}" src/stdafx.cpp)
 
 include_directories(include include/Shared src)
 add_library(Shared ${Shared_src} ${Shared_include} ${Platform_src})
-target_link_libraries(Shared lua)
 
 # Public include paths for library
 target_include_directories(Shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/third_party/)
+include(FindLibraries)
+target_link_libraries(Shared LuaJIT::LuaJIT)

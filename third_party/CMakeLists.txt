@@ -1,7 +1,6 @@
 # All third party libraries
 cmake_minimum_required(VERSION 3.4)
 
-add_subdirectory(lua-5.3.5)
 
 #cpr test programs
 option(BUILD_CPR_TESTS "Set to ON to build cpr tests." OFF)
