@@ -81,11 +81,13 @@ add_subdirectory(Tests)
 add_subdirectory(Tests.Shared)
 add_subdirectory(Tests.Game)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	#updater for windows
+	add_subdirectory(updater)
+endif()
+
 # Enabled project filters on windows
 if(MSVC)
-    #updater for windows
-    add_subdirectory(updater)
-
     # Use filters in VS projects
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

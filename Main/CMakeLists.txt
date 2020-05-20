@@ -59,6 +59,9 @@ target_compile_definitions(usc-game PRIVATE GIT_COMMIT=${GIT_DATE_HASH})
 set_output_postfixes(usc-game)
 
 # Target subsystem on windows, set debugging folder
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   set_target_properties(usc-game PROPERTIES WIN32_EXECUTABLE ON)
+endif()
 if(MSVC)
     set_target_properties(usc-game PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
     set_target_properties(usc-game PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
