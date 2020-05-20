@@ -36,4 +36,5 @@ target_include_directories(Beatmap PRIVATE
 target_link_libraries(Beatmap Shared)
 
 ## 3rd Party dependencies
-target_link_libraries(Beatmap sqlite3)
+target_include_directories(Beatmap PRIVATE "${SQLite3_INCLUDE_DIR}")
+target_link_libraries(Beatmap "${SQLite3_LIBRARY}")

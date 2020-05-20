@@ -52,6 +52,7 @@ find_package(JPEG REQUIRED)
 find_package(Vorbis REQUIRED)
 find_package(OGG REQUIRED)
 find_package(LibArchive REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 # All projects use unicode define
 # this is mainly for windows functions either being defined to call A or W prefixed functions
@@ -95,7 +96,6 @@ if(MSVC)
     # Put all third party libraries in a seperate folder in the VS solution
     set_target_properties(cpr PROPERTIES FOLDER "Third Party")
     set_target_properties(nanovg PROPERTIES FOLDER "Third Party")
-    set_target_properties(sqlite3 PROPERTIES FOLDER "Third Party")
     set_target_properties(discord-rpc PROPERTIES FOLDER "Third Party")
     set_target_properties(minimp3 PROPERTIES FOLDER "Third Party")
     set_target_properties(soundtouch PROPERTIES FOLDER "Third Party")

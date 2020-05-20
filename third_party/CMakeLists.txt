@@ -40,14 +40,6 @@ target_include_directories(miniaudio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/minia
 add_library(nlohmann_json INTERFACE)
 target_include_directories(nlohmann_json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/nlohmann_json)
 
-#sqlite
-add_library(sqlite3
-    sqlite3/sqlite3.c
-    sqlite3/sqlite3.h
-    sqlite3/sqlite3ext.h
-)
-target_include_directories(sqlite3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sqlite3)
-
 #minimp3
 add_library(minimp3
     minimp3/minimp3.c
