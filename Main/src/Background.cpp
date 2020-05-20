@@ -97,11 +97,56 @@ public:
 		String skin = g_gameConfig.GetString(GameConfigKeys::Skin);
 		lua = luaL_newstate();
 
+	#if defined(LUAJIT_VERSION_NUM) && LUAJIT_VERSION_NUM == 20100
+		#define LUA_LOADED_TABLE "_LOADED"
+		#define lua_getfield(L, i, k) (lua_getfield((L), (i), (k)), lua_type((L), -1))
+
+		auto lua_absindex = [](lua_State *L, int idx) -> int {
+			if (idx < 0 && idx > LUA_REGISTRYINDEX)
+				idx += lua_gettop(L) + 1;
+			return idx;
+		};
+		auto luaL_getsubtable = [&lua_absindex](lua_State *L, int idx, const char *fname) -> int {
+			if (lua_getfield(L, idx, fname) == LUA_TTABLE)
+				return 1;  /* table already there */
+			else {
+				lua_pop(L, 1);  /* remove previous result */
+				idx = lua_absindex(L, idx);
+				lua_newtable(L);
+				lua_pushvalue(L, -1);  /* copy to be left at top */
+				lua_setfield(L, idx, fname);  /* assign new table to field */
+				return 0;  /* false, because did not find table there */
+			}
+		};
+		auto luaL_requiref = [&luaL_getsubtable](lua_State *L, const char *modname, lua_CFunction openf, int glb) -> void {
+			luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
+			lua_getfield(L, -1, modname);  /* LOADED[modname] */
+			if (!lua_toboolean(L, -1)) {  /* package not already loaded? */
+				lua_pop(L, 1);  /* remove field */
+				lua_pushcfunction(L, openf);
+				lua_pushstring(L, modname);  /* argument to open function */
+				lua_call(L, 1, 1);  /* call 'openf' to open module */
+				lua_pushvalue(L, -1);  /* make copy of module (call result) */
+				lua_setfield(L, -3, modname);  /* LOADED[modname] = module */
+			}
+			lua_remove(L, -2);  /* remove LOADED table */
+			if (glb) {
+				lua_pushvalue(L, -1);  /* copy of module */
+				lua_setglobal(L, modname);  /* _G[modname] = module */
+			}
+		};
+		auto openLib = [this, &luaL_requiref](const char* name, lua_CFunction lib)
+		{
+			luaL_requiref(lua, name, lib, 1);
+			lua_pop(lua, 1);
+		};
+	#else
 		auto openLib = [this](char* name, lua_CFunction lib)
 		{
 			luaL_requiref(lua, name, lib, 1);
 			lua_pop(lua, 1);
 		};
+	#endif
 
 		//open libs
 		//TODO: not sure which should be included

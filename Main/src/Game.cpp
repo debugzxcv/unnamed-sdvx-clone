@@ -2049,7 +2049,8 @@ public:
 
 			auto setCursorData = [&](int ci)
 			{
-				lua_geti(L, -1, ci);
+				lua_pushinteger(L, ci);
+				lua_gettable(L, -2);
 
 #define TPOINT(name, y) Vector2 name = m_camera.Project(m_camera.critOrigin.TransformPoint(Vector3((m_scoring.laserPositions[ci] - Track::trackWidth * 0.5f) * (5.0f / 6), y, 0)))
 				TPOINT(cPos, 0);
@@ -2130,11 +2131,13 @@ public:
 		lua_pushstring(L, "cursors");
 		lua_newtable(L);
 		{
+			lua_pushinteger(L, 0);
 			lua_newtable(L);
-			lua_seti(L, -2, 0);
+			lua_settable(L, -3);
 
+			lua_pushinteger(L, 1);
 			lua_newtable(L);
-			lua_seti(L, -2, 1);
+			lua_settable(L, -3);
 		}
 		lua_settable(L, -3); // cursors -> critLine
 		lua_pushstring(L, "line");
