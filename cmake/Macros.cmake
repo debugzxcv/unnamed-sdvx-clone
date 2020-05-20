@@ -2,22 +2,22 @@
 #	src 	= Path to source files
 #	pchSrc 	= Path to precompiled header source file
 macro(enable_precompiled_headers src pchSrc)
-    if(MSVC)
+    if(MSVC AND NOT "${CMAKE_GENERATOR}" MATCHES "^Ninja")
         #message("Enabling precompiled header generated from source file ${pchSrc}")
         #message("Files using precompiled headers => ${src}")
         # Set precompiled header usage
         set_source_files_properties(${src} PROPERTIES COMPILE_FLAGS "/Yu")
         # Set precompiled header
         set_source_files_properties(${pchSrc} PROPERTIES COMPILE_FLAGS "/Yc")
-    endif(MSVC)
+    endif()
 endmacro(enable_precompiled_headers)
 
 # Excludes a file from precompiled header usage
 macro(precompiled_header_exclude exclude)
-    if(MSVC)
+    if(MSVC AND NOT "${CMAKE_GENERATOR}" MATCHES "^Ninja")
         # Excluded files
         set_source_files_properties(${exclude} PROPERTIES COMPILE_FLAGS "")
-    endif(MSVC)
+    endif()
 endmacro(precompiled_header_exclude)
 
 # Set output binary postfixes so that they will be named <project>_<configuration>.exe/dll

@@ -25,12 +25,14 @@ jobs:
                 .\vcpkg.exe integrate install
                 .\vcpkg.exe install '@${{ github.workspace }}/build.windows'
                 }
-            - name: cmake
-              run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019" -A x64 .
-            - name: Setup MSBuild.exe
-              uses: warrenbuckley/Setup-MSBuild@v1
-            - name: MSBuild
-              run: msbuild USC.sln -p:Configuration=Release /m /verbosity:minimal
+            - name: Setup Ninja
+              uses: ashutoshvarma/setup-ninja@master
+            - name: Build
+              run: |
+                call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+                cmake -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -G "Ninja Multi-Config" -DCMAKE_IGNORE_PATH="C:/ProgramData/chocolatey/bin;C:/Strawberry/c/bin" -S . -B out
+                cmake --build out --config Release
+              shell: cmd
             - name: Tests
               run: rm ./bin/Tests.*
             - name: Upload artifact
